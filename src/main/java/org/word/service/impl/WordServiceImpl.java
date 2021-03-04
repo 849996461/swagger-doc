@@ -48,15 +48,17 @@ public class WordServiceImpl implements WordService {
     /**
      * 在此筛选
      */
-    HashSet<String> set = new HashSet<>();
+    HashSet<String> filterApi = new HashSet<>();
     {
-        set.add("获取命令执行结果");
-        set.add("任务命令查询");
-        set.add("任务网元查询");
-        set.add("删除任务");
-        set.add("任务查询");
-        set.add("启动任务");
-        set.add("创建任务");
+        filterApi.add("获取命令执行结果");
+        filterApi.add("任务命令查询");
+        filterApi.add("任务网元查询");
+        filterApi.add("删除任务");
+        filterApi.add("任务查询");
+        filterApi.add("任务重启");
+        filterApi.add("启动/恢复任务");
+        filterApi.add("暂停任务");
+        filterApi.add("创建任务");
     }
 
     @Override
@@ -66,7 +68,7 @@ public class WordServiceImpl implements WordService {
         try {
             Map<String, Object> map = getResultFromString(result, jsonStr);
             result = result.stream().filter(e -> e.getTitle().startsWith("order-"))
-                    .filter(e -> set.contains(e.getTag()))
+                    .filter(e -> filterApi.contains(e.getTag()))
                     .collect(Collectors.toList());
             Map<String, List<Table>> tableMap = result.stream().parallel()
                     .collect(Collectors.groupingBy(Table::getTitle));
