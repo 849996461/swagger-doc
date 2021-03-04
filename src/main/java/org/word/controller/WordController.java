@@ -21,6 +21,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by XiuYin.Cui on 2018/1/11.
@@ -59,6 +60,7 @@ public class WordController {
 
     private void generateModelData(Model model, String url, Integer download) {
         url = StringUtils.defaultIfBlank(url, swaggerUrl);
+        //生成map
         Map<String, Object> result = tableService.tableList(url);
         model.addAttribute("url", url);
         model.addAttribute("download", download);

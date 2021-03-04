@@ -45,13 +45,31 @@ public class WordServiceImpl implements WordService {
         return resultMap;
     }
 
+    /**
+     * 在此筛选
+     */
+    HashSet<String> set = new HashSet<>();
+    {
+        set.add("获取命令执行结果");
+        set.add("任务命令查询");
+        set.add("任务网元查询");
+        set.add("删除任务");
+        set.add("任务查询");
+        set.add("启动任务");
+        set.add("创建任务");
+    }
+
     @Override
     public Map<String, Object> tableListFromString(String jsonStr) {
         Map<String, Object> resultMap = new HashMap<>();
         List<Table> result = new ArrayList<>();
         try {
             Map<String, Object> map = getResultFromString(result, jsonStr);
-            Map<String, List<Table>> tableMap = result.stream().parallel().collect(Collectors.groupingBy(Table::getTitle));
+            result = result.stream().filter(e -> e.getTitle().startsWith("order-"))
+                    .filter(e -> set.contains(e.getTag()))
+                    .collect(Collectors.toList());
+            Map<String, List<Table>> tableMap = result.stream().parallel()
+                    .collect(Collectors.groupingBy(Table::getTitle));
             resultMap.put("tableMap", new TreeMap<>(tableMap));
             resultMap.put("info", map.get("info"));
 
@@ -417,6 +435,7 @@ public class WordServiceImpl implements WordService {
             return resMap.get("#/definitions/" + modeName);
         }
         Map<String, Object> modeProperties = (Map<String, Object>) swaggerMap.get(modeName).get("properties");
+        Set<String> requiredSet = new HashSet(Optional.ofNullable((List) swaggerMap.get(modeName).get("required")).orElse(new ArrayList()));
         if (modeProperties == null) {
             return null;
         }
@@ -429,6 +448,7 @@ public class WordServiceImpl implements WordService {
             Map<String, Object> attrInfoMap = (Map<String, Object>) mEntry.getValue();
             ModelAttr child = new ModelAttr();
             child.setName(mEntry.getKey());
+            child.setRequire(requiredSet.contains(mEntry.getKey()));
             child.setType((String) attrInfoMap.get("type"));
             if (attrInfoMap.get("format") != null) {
                 child.setType(child.getType() + "(" + attrInfoMap.get("format") + ")");
